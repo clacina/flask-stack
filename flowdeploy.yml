@@ -1,0 +1,14 @@
+service:
+  name: dataprocess
+  # still need to add msg to the hardcoded list in flowdeploy.  until that happens...
+  category: dataprocess
+docker:
+  image_name: dataprocess
+python:
+  package: dataprocess
+test:
+  # WP 2023: Use --cov=. to ensure full paths are used in coverage.xml
+  # https://github.com/pytest-dev/pytest-cov/issues/305
+  # https://github.com/pytest-dev/pytest-cov/issues/175
+  cmd: pytest --hypothesis-show-statistics --cov=. --cov-config=setup.cfg --cov-report=term-missing --cov-report xml:coverage.xml
+  coverage: pytest --hypothesis-show-statistics --cov=. --cov-config=setup.cfg --cov-report=term-missing --cov-report xml:coverage.xml
