@@ -1,31 +1,27 @@
-ARG PYTHON_VERSION=3.11.6
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:3.11-alpine
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Set up environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
+# Create and set the working directory
 WORKDIR /app
 
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
+# Copy only the requirements file first to leverage Docker caching
+COPY . .
+COPY requirements.txt .
+#COPY lib/ .
 
-# Install the dependencies
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir lib/osdbaccess-1.0-py2.py3-none-any.whl
+RUN pip install --no-cache-dir -r requirements.txt
 
-USER appuser
-
+# Copy the entire application code
 COPY . .
 
-EXPOSE 8000
+# Expose the port your application will run on
+EXPOSE 8080
 
-# Run the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "hello:app"]
+# Specify the command to run on container start
+CMD ["python", "src/app.py"]
+

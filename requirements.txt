@@ -1,2 +1,5 @@
 flask
 gunicorn
+apiflask
+flask-rich
+psycopg2-binary
